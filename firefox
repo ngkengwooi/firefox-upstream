@@ -1,0 +1,62 @@
+#!/bin/bash -e
+
+# Launcher script for upstream firefox binary from Mozilla.
+# Install this script as /usr/local/bin/firefox.
+# Remember to make it executable (as root): chmod +x /usr/local/bin/firefox.
+# This script will create a launcher for firefox, pointing to itself.
+# When executed, the script will check if a firefox installation exists in the user's home directory.
+# If it does, the script will launch firefox from the user's home directory.
+# If it doesn't, the script will download the latest binary from Mozilla, install it in the user's home directory, and launch it.
+
+PARAM="$1"
+APPDIR="$HOME/.local/share"
+TARBALL="$APPDIR/firefox.tar.bz2"
+
+launchFirefox() {
+	echo "Launching Firefox..."
+	if [ "$1" == "" ]; then
+		$APPDIR/firefox/firefox &
+	else
+		$APPDIR/firefox/firefox "$1" &
+	fi
+}
+
+if [ -f "$APPDIR/firefox/firefox" ]; then
+	launchFirefox
+else
+	echo "Installing Firefox, please wait..."
+	# Default to the 32-bit package
+	OS=linux
+	ARCH="i386"
+	LANG=en-US
+	
+	# Redefine variables if 64-bit OS detected
+	if [ `uname -m` == "x86_64" ]; then
+		OS=linux64
+		ARCH=amd64
+	fi
+	
+	# Use the landing page for the download to extract file URL and version.
+	URL=$(curl -s "https://download.mozilla.org/?product=firefox-latest-ssl&os=$OS&lang=$LANG" | grep "https://" | cut -d '"' -f 2)
+	VERSION=$(echo "$URL" | grep -Eom 1 "/([0-9.]+)/" | cut -d "/" -f 2)
+	echo "================================================================================"
+	echo "Version      : $VERSION"
+	echo "Architecture : $ARCH"
+	echo "Language     : $LANG"
+	echo "================================================================================"
+
+	# Create the directory, or this may error out.
+	mkdir -p $APPDIR
+
+	# Remove target directory if it exists.
+	# This ensures a fresh installation always.
+	rm -rf $APPDIR/firefox
+
+	# Download the tarball.
+	curl "$URL" > "$TARBALL"
+	
+	tar -C "$APPDIR" -xvjf "$TARBALL"
+	rm -f "$TARBALL"
+	
+	launchFirefox "$PARAM"
+fi

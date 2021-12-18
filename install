@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+# Script to install Firefox launcher script and shortcut.
+
+cp ./firefox /usr/local/bin/firefox
+chmod +x /usr/local/bin/firefox
+
+printf "[Desktop Entry]
+Name=Mozilla Firefox
+Comment=Web Browser
+Exec=firefox %%u
+Terminal=false
+Type=Application
+Icon=firefox-esr
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+Actions=Private;
+	
+[Desktop Action Private]
+Exec=firefox --private-window %%u
+Name=Open in private mode" > /usr/share/applications/firefox-upstream.desktop
