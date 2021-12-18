@@ -34,7 +34,7 @@ As root or superuser, execute the installation script:
 sudo ./install
 ```
 
-A new Firefox icon should appear in the application menu. Launch that to start installing Firefox.
+A new Mozilla Firefox icon should appear in the application menu. Launch that to start installing Firefox.
 
 ## Known issues
 
